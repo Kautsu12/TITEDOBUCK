@@ -1,117 +1,99 @@
 // Busca automática de recomendações sobre o Bucky / Soldado Invernal.
-// - HQs: API oficial da Marvel (precisa MARVEL_PUBLIC_KEY e MARVEL_PRIVATE_KEY)
-// - Livros: API do Google Books (GOOGLE_BOOKS_KEY é opcional)
-// Gera src/data/hqs.json e src/data/livros.json.
-// Rodar: npm run atualizar  (ou pela GitHub Action semanal)
+// Fonte principal: Google Books (NÃO precisa de chave) — cobre HQs/graphic novels e livros.
+// A lista curada (seed-hqs.json / seed-livros.json) é a base fixa: nunca some.
+// A rotina semanal (GitHub Action) acrescenta novidades por cima, sem repetir.
+// Rodar localmente: npm run atualizar
 
-import { createHash } from 'node:crypto';
-import { writeFile, mkdir } from 'node:fs/promises';
+import { writeFile, mkdir, readFile } from 'node:fs/promises';
 
-const DATA_DIR = new URL('../src/data/', import.meta.url);
-const AMAZON_TAG = process.env.AMAZON_TAG || '';
+const DATA = new URL('../src/data/', import.meta.url);
+const TAG = process.env.AMAZON_TAG || '';
 
-function amazonSearch(title) {
-  const q = encodeURIComponent(title);
-  return AMAZON_TAG
-    ? `https://www.amazon.com.br/s?k=${q}&tag=${AMAZON_TAG}`
-    : `https://www.amazon.com.br/s?k=${q}`;
-}
+const amazon = (t) =>
+  `https://www.amazon.com.br/s?k=${encodeURIComponent(t)}${TAG ? `&tag=${TAG}` : ''}`;
 
-async function fetchMarvelHQs() {
-  const pub = process.env.MARVEL_PUBLIC_KEY;
-  const priv = process.env.MARVEL_PRIVATE_KEY;
-  if (!pub || !priv) {
-    console.log('Marvel: chaves ausentes — pulando HQs.');
-    return null;
-  }
-  const ts = Date.now().toString();
-  const hash = createHash('md5').update(ts + priv + pub).digest('hex');
-  const base = 'https://gateway.marvel.com/v1/public';
-  const auth = `ts=${ts}&apikey=${pub}&hash=${hash}`;
+const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-  // Encontra o personagem "Winter Soldier" e pega as HQs dele.
-  let comics = [];
+// Segurança: só aceita URLs http(s). Bloqueia javascript:, data:, etc. vindos de fontes externas.
+const safeUrl = (u) => (/^https?:\/\//i.test(u || '') ? u : '');
+
+async function readJson(name, fallback) {
   try {
-    const rc = await fetch(`${base}/characters?name=${encodeURIComponent('Winter Soldier')}&${auth}`);
-    const jc = await rc.json();
-    const char = jc?.data?.results?.[0];
-    if (char) {
-      const r = await fetch(`${base}/characters/${char.id}/comics?orderBy=-onsaleDate&limit=12&${auth}`);
-      const j = await r.json();
-      comics = j?.data?.results || [];
-    }
-  } catch (e) {
-    console.error('Marvel personagem erro:', e.message);
+    return JSON.parse(await readFile(new URL(name, DATA), 'utf8'));
+  } catch {
+    return fallback;
   }
-
-  if (comics.length === 0) {
-    const r = await fetch(`${base}/comics?titleStartsWith=${encodeURIComponent('Winter Soldier')}&orderBy=-onsaleDate&limit=12&${auth}`);
-    const j = await r.json();
-    comics = j?.data?.results || [];
-  }
-
-  return comics
-    .map((c) => {
-      const image = c.thumbnail
-        ? `${c.thumbnail.path}.${c.thumbnail.extension}`.replace('http://', 'https://')
-        : '';
-      const detail = c.urls?.find((u) => u.type === 'detail')?.url;
-      return {
-        title: c.title,
-        description: (c.description || '').replace(/\s+/g, ' ').trim().slice(0, 180),
-        image,
-        url: AMAZON_TAG ? amazonSearch(c.title) : (detail || amazonSearch(c.title)),
-        store: AMAZON_TAG ? 'Amazon' : 'Marvel',
-      };
-    })
-    .filter((x) => x.title && !x.image.includes('image_not_available'));
 }
 
-async function fetchBooks() {
+async function googleBooks(query) {
   const key = process.env.GOOGLE_BOOKS_KEY ? `&key=${process.env.GOOGLE_BOOKS_KEY}` : '';
-  const q = encodeURIComponent('"Winter Soldier" OR "Bucky Barnes" Marvel');
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=12&printType=books${key}`;
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&printType=books&orderBy=relevance${key}`;
   const r = await fetch(url);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const j = await r.json();
   return (j.items || [])
     .map((it) => {
       const v = it.volumeInfo || {};
-      const image = (v.imageLinks?.thumbnail || v.imageLinks?.smallThumbnail || '').replace('http://', 'https://');
       return {
         title: v.title,
-        description: (v.description || (v.authors ? `Por ${v.authors.join(', ')}` : '')).slice(0, 180),
-        image,
-        url: AMAZON_TAG ? amazonSearch(v.title || '') : (v.infoLink || amazonSearch(v.title || '')),
-        store: AMAZON_TAG ? 'Amazon' : 'Google Books',
+        description: (v.description || (v.authors ? `Por ${v.authors.join(', ')}` : ''))
+          .replace(/\s+/g, ' ')
+          .slice(0, 180),
+        image: safeUrl((v.imageLinks?.thumbnail || v.imageLinks?.smallThumbnail || '').replace('http://', 'https://')),
+        url: safeUrl(TAG ? amazon(v.title || '') : (v.infoLink || amazon(v.title || ''))),
+        store: TAG ? 'Amazon' : 'Google Books',
+        categories: v.categories || [],
       };
     })
-    .filter((x) => x.title);
+    .filter((x) => x.title && x.url);
+}
+
+function merge(seed, fresh, max = 16) {
+  const seen = new Set(seed.map((x) => norm(x.title)));
+  const out = [...seed];
+  for (const item of fresh) {
+    const k = norm(item.title);
+    if (k && !seen.has(k)) {
+      seen.add(k);
+      out.push({ title: item.title, description: item.description, image: item.image, url: item.url, store: item.store });
+    }
+  }
+  return out.slice(0, max);
 }
 
 async function main() {
-  await mkdir(DATA_DIR, { recursive: true });
+  await mkdir(DATA, { recursive: true });
+  const seedHqs = await readJson('seed-hqs.json', []);
+  const seedLivros = await readJson('seed-livros.json', []);
+
+  let hqsFresh = [];
+  let livrosFresh = [];
 
   try {
-    const hqs = await fetchMarvelHQs();
-    if (hqs && hqs.length) {
-      await writeFile(new URL('hqs.json', DATA_DIR), JSON.stringify(hqs, null, 2));
-      console.log(`HQs: ${hqs.length} itens salvos.`);
-    }
+    const found = await googleBooks('"Winter Soldier" Marvel');
+    hqsFresh = found.filter(
+      (x) =>
+        /comic|graphic/i.test((x.categories || []).join(' ')) ||
+        /winter soldier|soldado invernal|bucky/i.test(x.title)
+    );
+    console.log(`HQs encontradas: ${hqsFresh.length}`);
   } catch (e) {
     console.error('Erro nas HQs:', e.message);
   }
 
   try {
-    const livros = await fetchBooks();
-    if (livros && livros.length) {
-      await writeFile(new URL('livros.json', DATA_DIR), JSON.stringify(livros, null, 2));
-      console.log(`Livros: ${livros.length} itens salvos.`);
-    }
+    livrosFresh = await googleBooks('Bucky Barnes Marvel Capitão América');
+    console.log(`Livros encontrados: ${livrosFresh.length}`);
   } catch (e) {
     console.error('Erro nos livros:', e.message);
   }
 
-  console.log('Atualização concluída.');
+  const hqs = merge(seedHqs, hqsFresh);
+  const livros = merge(seedLivros, livrosFresh);
+
+  await writeFile(new URL('hqs.json', DATA), JSON.stringify(hqs, null, 2));
+  await writeFile(new URL('livros.json', DATA), JSON.stringify(livros, null, 2));
+  console.log(`Salvos: ${hqs.length} HQs e ${livros.length} livros.`);
 }
 
 main();
