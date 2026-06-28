@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "title": "The Art of Captain America: The Winter Soldier",
+    "description": "Artbook com concept arts e bastidores do filme do Soldado Invernal.",
+    "image": "",
+    "url": "https://www.amazon.com.br/s?k=The+Art+of+Captain+America+The+Winter+Soldier",
+    "store": "Amazon"
+  },
+  {
+    "title": "Marvel: Guia Definitivo dos Personagens",
+    "description": "Enciclopédia com a ficha completa do Bucky e de todo o universo Marvel.",
+    "image": "",
+    "url": "https://www.amazon.com.br/s?k=Marvel+Guia+Definitivo+dos+Personagens",
+    "store": "Amazon"
+  },
+  {
+    "title": "Marvel Studios: O Guia Visual Definitivo",
+    "description": "Linha do tempo do MCU com os principais momentos do Soldado Invernal.",
+    "image": "",
+    "url": "https://www.amazon.com.br/s?k=Marvel+Studios+Guia+Visual+Definitivo",
+    "store": "Amazon"
+  },
+  {
+    "title": "Capitão América: O Primeiro Vingador — Livro Oficial",
+    "description": "Bastidores e arte da origem da amizade entre Steve e Bucky.",
+    "image": "",
+    "url": "https://www.amazon.com.br/s?k=Capit%C3%A3o+Am%C3%A9rica+Primeiro+Vingador+livro",
+    "store": "Amazon"
+  }
+]
