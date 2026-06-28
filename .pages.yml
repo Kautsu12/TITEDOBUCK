@@ -1,0 +1,59 @@
+# Configuração do painel de postagem (Pages CMS — https://pagescms.org)
+# Com isto, a gestora edita o site por um painel visual em https://app.pagescms.org
+# (login com o GitHub), sem mexer em código.
+
+media:
+  input: public
+  output: /
+
+content:
+  - name: blog
+    label: Blog e Histórias
+    type: collection
+    path: src/content/blog
+    filename: "{fields.title}.md"
+    view:
+      fields: [title, category, pubDate, draft]
+    fields:
+      - { name: title, label: Título, type: string }
+      - { name: description, label: Resumo (aparece nos cards), type: text }
+      - { name: pubDate, label: Data de publicação, type: date }
+      - name: category
+        label: Categoria
+        type: select
+        options:
+          values:
+            - { value: teoria, label: Teoria }
+            - { value: analise, label: Análise de filme }
+            - { value: guia, label: Guia de leitura }
+            - { value: fanfic, label: História não oficial (fanfic) }
+      - { name: cover, label: Imagem de capa (opcional), type: image }
+      - { name: draft, label: "Rascunho? (marque para NÃO publicar ainda)", type: boolean, default: false }
+      - { name: body, label: Conteúdo, type: rich-text }
+
+  - name: produtos
+    label: Loja (recomendações)
+    type: collection
+    path: src/content/produtos
+    filename: "{fields.title}.md"
+    view:
+      fields: [title, type, price, featured]
+    fields:
+      - { name: title, label: Nome do produto, type: string }
+      - { name: description, label: Descrição curta, type: text }
+      - name: type
+        label: Tipo
+        type: select
+        options:
+          values:
+            - { value: hq, label: HQ }
+            - { value: filme, label: Filme / Série }
+            - { value: action-figure, label: Action Figure }
+            - { value: livro, label: Livro }
+            - { value: geral, label: Geral }
+      - { name: price, label: "Preço (ex.: R$ 99,90)", type: string }
+      - { name: image, label: Imagem do produto, type: image }
+      - { name: affiliateUrl, label: Link de afiliado (Amazon etc.), type: string }
+      - { name: store, label: "Loja (ex.: Amazon)", type: string, default: Amazon }
+      - { name: featured, label: "Destacar na página inicial?", type: boolean, default: true }
+      - { name: order, label: "Ordem de exibição (número)", type: number, default: 0 }

@@ -102,3 +102,31 @@ order: 1
 1. Suba o projeto para um repositório no GitHub.
 2. Em vercel.com, **Add New → Project** e importe o repositório.
 3. A Vercel detecta o Astro automaticamente (build `astro build`, output `dist`). É só clicar em **Deploy**.
+
+O site está publicado em: **https://tietedobuck.vercel.app**
+
+## Painel de postagem (sem mexer em código)
+
+O arquivo `.pages.yml` já configura um painel visual via **Pages CMS**. Para a
+gestora postar como num editor de texto:
+
+1. Acesse **https://app.pagescms.org** e entre com a conta do **GitHub**.
+2. Autorize o acesso ao repositório `Kautsu12/TITEDOBUCK`.
+3. Pronto: aparecem as seções **Blog e Histórias** e **Loja (recomendações)**.
+   Escrever um post ou cadastrar um produto e salvar publica direto no site
+   (a Vercel reconstrói sozinha em ~1 min).
+
+## Comentários no blog (Giscus)
+
+1. No GitHub, abra o repositório → **Settings** → marque **Discussions**.
+2. Instale o app: **https://github.com/apps/giscus** → habilite no repositório.
+3. Em **https://giscus.app**, informe `Kautsu12/TITEDOBUCK`, mapeamento **pathname**
+   e uma categoria (ex.: crie "Comentários").
+4. Copie o `data-repo-id` e o `data-category-id` gerados para `src/config.ts`
+   (objeto `GISCUS`). Enquanto não preencher, a seção de comentários fica oculta.
+
+## Personalização rápida (`src/config.ts`)
+
+- `SOCIAL.tiktok` e `SOCIAL.twitter`: links das redes.
+- `CONTACT_EMAIL`: e-mail de contato no rodapé (deixe `''` para esconder).
+- `GISCUS`: IDs dos comentários (ver acima).

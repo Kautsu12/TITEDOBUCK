@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -41,4 +42,6 @@ const dateStr = post.data.pubDate.toLocaleDateString('pt-BR', {
       ← Voltar para o blog
     </a>
   </article>
+
+  <Comments />
 </BaseLayout>

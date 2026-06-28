@@ -8,37 +8,49 @@ const produtos = (await getCollection('produtos')).sort(
   (a, b) => a.data.order - b.data.order
 );
 
-const filtros = [
+// Seções por categoria, na ordem de exibição.
+const grupos = [
   { type: 'hq', label: 'HQs' },
-  { type: 'filme', label: 'Filmes' },
-  { type: 'action-figure', label: 'Action Figures' },
+  { type: 'filme', label: 'Filmes e Séries' },
   { type: 'livro', label: 'Livros' },
-  { type: 'geral', label: 'Geral' },
+  { type: 'action-figure', label: 'Action Figures e Colecionáveis' },
+  { type: 'geral', label: 'Outros' },
 ];
+
+const porTipo = grupos
+  .map((g) => ({ ...g, itens: produtos.filter((p) => p.data.type === g.type) }))
+  .filter((g) => g.itens.length > 0);
 ---
 
-<BaseLayout title="Loja" description="Os melhores produtos do Bucky Barnes: HQs, filmes, action figures e mais.">
+<BaseLayout title="Loja" description="Recomendações de HQs, filmes, livros e colecionáveis do Bucky Barnes / Soldado Invernal.">
   <section class="mx-auto max-w-6xl px-4 py-16">
-    <h1 class="font-display text-3xl font-bold uppercase tracking-wide text-white">Loja do fã</h1>
+    <h1 class="font-display text-3xl font-bold uppercase tracking-wide text-white">Recomendações</h1>
     <p class="mt-3 max-w-2xl text-steel">
-      HQs, filmes, action figures, livros e itens selecionados a dedo. Os links levam às lojas parceiras.
+      HQs, filmes e séries, livros e colecionáveis do Bucky, escolhidos a dedo. Os links levam às lojas parceiras.
     </p>
     <p class="mt-4 max-w-2xl rounded-lg border border-winter-600/60 bg-winter-800 p-4 text-xs text-steel/80">
       {AFFILIATE_DISCLOSURE}
     </p>
 
-    <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {produtos.map((p) => (
-        <ProductCard
-          title={p.data.title}
-          description={p.data.description}
-          image={p.data.image}
-          price={p.data.price}
-          affiliateUrl={p.data.affiliateUrl}
-          store={p.data.store}
-          type={p.data.type}
-        />
-      ))}
-    </div>
+    {porTipo.map((g) => (
+      <div class="mt-14">
+        <h2 class="mb-6 font-display text-2xl font-bold uppercase tracking-wide text-white">
+          {g.label}
+        </h2>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {g.itens.map((p) => (
+            <ProductCard
+              title={p.data.title}
+              description={p.data.description}
+              image={p.data.image}
+              price={p.data.price}
+              affiliateUrl={p.data.affiliateUrl}
+              store={p.data.store}
+              type={p.data.type}
+            />
+          ))}
+        </div>
+      </div>
+    ))}
   </section>
 </BaseLayout>

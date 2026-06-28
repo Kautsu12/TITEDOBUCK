@@ -1,0 +1,34 @@
+---
+// Seção de comentários via Giscus (usa GitHub Discussions).
+// Fica oculta automaticamente enquanto os IDs não forem preenchidos no config.ts.
+import { GISCUS } from '../config';
+
+const enabled =
+  GISCUS.repoId && !GISCUS.repoId.startsWith('COLE_') &&
+  GISCUS.categoryId && !GISCUS.categoryId.startsWith('COLE_');
+---
+
+{enabled && (
+  <section class="mx-auto max-w-3xl px-4 pb-16">
+    <h2 class="mb-6 font-display text-xl font-bold uppercase tracking-wide text-white">
+      Comentários
+    </h2>
+    <script
+      is:inline
+      src="https://giscus.app/client.js"
+      data-repo={GISCUS.repo}
+      data-repo-id={GISCUS.repoId}
+      data-category={GISCUS.category}
+      data-category-id={GISCUS.categoryId}
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="dark"
+      data-lang="pt"
+      crossorigin="anonymous"
+      async
+    ></script>
+  </section>
+)}
