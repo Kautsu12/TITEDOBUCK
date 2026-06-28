@@ -1,0 +1,34 @@
+name: Atualizar recomendações
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # toda segunda-feira, 09:00 UTC
+  workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow"
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Buscar HQs e livros
+        run: node scripts/atualizar-recomendacoes.mjs
+        env:
+          MARVEL_PUBLIC_KEY: ${{ secrets.MARVEL_PUBLIC_KEY }}
+          MARVEL_PRIVATE_KEY: ${{ secrets.MARVEL_PRIVATE_KEY }}
+          GOOGLE_BOOKS_KEY: ${{ secrets.GOOGLE_BOOKS_KEY }}
+          AMAZON_TAG: ${{ secrets.AMAZON_TAG }}
+
+      - name: Commit das atualizações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data
+          git commit -m "Atualiza recomendações automáticas (HQs e livros)" || echo "Sem mudanças para commitar"
+          git push

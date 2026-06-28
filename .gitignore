@@ -8,6 +8,10 @@ node_modules/
 # astro
 .astro/
 
+# tinacms (gerado)
+tina/__generated__/
+public/admin/
+
 # env
 .env
 .env.production

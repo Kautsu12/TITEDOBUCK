@@ -105,16 +105,53 @@ order: 1
 
 O site está publicado em: **https://tietedobuck.vercel.app**
 
-## Painel de postagem (sem mexer em código)
+## Painel de postagem com login por E-MAIL (TinaCMS) — escolhido
 
-O arquivo `.pages.yml` já configura um painel visual via **Pages CMS**. Para a
-gestora postar como num editor de texto:
+Com isto, a gestora entra por **e-mail** (sem precisar de conta GitHub) e publica
+por um painel no próprio site, em `https://tietedobuck.vercel.app/admin`.
 
-1. Acesse **https://app.pagescms.org** e entre com a conta do **GitHub**.
-2. Autorize o acesso ao repositório `Kautsu12/TITEDOBUCK`.
-3. Pronto: aparecem as seções **Blog e Histórias** e **Loja (recomendações)**.
-   Escrever um post ou cadastrar um produto e salvar publica direto no site
-   (a Vercel reconstrói sozinha em ~1 min).
+Configuração (uma vez só, feita pelo dono do projeto):
+
+1. Crie uma conta em **https://app.tina.io** e clique em **Create Project** →
+   conecte o repositório `Kautsu12/TITEDOBUCK`.
+2. O TinaCloud te dá dois valores: um **Client ID** e um **Token (read-only)**.
+3. Na **Vercel** → projeto → **Settings → Environment Variables**, adicione:
+   - `TINA_CLIENT_ID` = (o Client ID)
+   - `TINA_TOKEN` = (o Token)
+4. Ainda na Vercel → **Settings → Build & Output**, troque o **Build Command**
+   para: `npm run build:tina`  (isso gera o painel `/admin`).
+5. Faça um novo deploy (Deployments → Redeploy).
+6. Em **app.tina.io → Collaborators**, convide a gestora pelo **e-mail** dela.
+   Ela acessa `…/admin`, entra com o e-mail e já pode escrever posts e cadastrar
+   produtos. Ao salvar, o site se reconstrói sozinho em ~1 min.
+
+> Observação: o `Build Command` só deve virar `npm run build:tina` DEPOIS dos
+> passos 1–3. Antes disso, mantenha `astro build` para o site não quebrar.
+> (O arquivo `.pages.yml` é de um painel alternativo por GitHub e pode ser ignorado.)
+
+## Busca automática (HQs, livros e fanfics)
+
+A página **/descobertas** mostra HQs e livros encontrados automaticamente, além de
+atalhos de busca de fanfics (Spirit, Wattpad, AO3 — fanfics não podem ser
+importadas, então levamos o leitor à fonte).
+
+Para ligar a busca automática:
+
+1. **HQs (Marvel):** crie chaves grátis em **https://developer.marvel.com** (Get a
+   Key). Você recebe uma *public key* e uma *private key*.
+2. **Livros (Google Books):** funciona sem chave; opcionalmente gere uma em
+   console.cloud.google.com para mais estabilidade.
+3. No **GitHub** → repositório → **Settings → Secrets and variables → Actions →
+   New repository secret**, adicione:
+   - `MARVEL_PUBLIC_KEY`, `MARVEL_PRIVATE_KEY`
+   - `GOOGLE_BOOKS_KEY` (opcional)
+   - `AMAZON_TAG` (opcional — sua tag de afiliado, ex.: `seutag-20`, para os
+     links de compra saírem com comissão)
+4. A rotina roda sozinha **toda segunda-feira** (GitHub Action
+   `Atualizar recomendações`). Para rodar na hora: aba **Actions** → selecione o
+   workflow → **Run workflow**.
+
+Rodar localmente (opcional): `npm run atualizar` (com as variáveis no ambiente).
 
 ## Comentários no blog (Giscus)
 
