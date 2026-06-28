@@ -1,0 +1,21 @@
+{
+  "name": "bucky-fan-hub",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Site de nicho de fã do Bucky Barnes — blog, fanfics e vitrine de afiliados.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.16.0",
+    "@astrojs/tailwind": "^5.1.2",
+    "@astrojs/mdx": "^3.1.8",
+    "@astrojs/sitemap": "^3.2.1",
+    "tailwindcss": "^3.4.14",
+    "@tailwindcss/typography": "^0.5.15"
+  }
+}

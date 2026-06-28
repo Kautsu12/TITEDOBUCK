@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SOCIAL } from '../config';
+---
+
+<BaseLayout title="Sobre" description="Quem está por trás do Bucky Hub.">
+  <section class="mx-auto max-w-3xl px-4 py-16">
+    <h1 class="font-display text-3xl font-bold uppercase tracking-wide text-white">Sobre</h1>
+    <div class="prose prose-invert mt-6 max-w-none prose-a:text-star">
+      <p>
+        Oi! Eu sou apaixonada pelo Bucky Barnes desde a primeira vez que ele apareceu
+        com aquele braço de metal. Este site é onde eu reúno tudo: minhas teorias,
+        análises, guias e as histórias que escrevo.
+      </p>
+      <p>
+        Me acompanhe também no <a href={SOCIAL.tiktok}>TikTok</a> e no
+        <a href={SOCIAL.twitter}>X</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
