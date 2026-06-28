@@ -18,3 +18,7 @@ npm-debug.log*
 # os / editor
 .DS_Store
 .vscode/
+
+# helper scripts (locais, nao versionar)
+*.bat
+push_log.txt
