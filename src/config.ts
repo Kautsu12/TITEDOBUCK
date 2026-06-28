@@ -1,20 +1,22 @@
-// Configurações centrais do site. Edite aqui em vez de caçar texto pelos componentes.
+// Configurações centrais do site.
+// Os campos editáveis pela gestora (no painel) ficam em src/data/site.json.
+import site from './data/site.json';
+
 export const SITE = {
-  title: 'Bucky Hub',
-  tagline: 'A casa oficial do conteúdo sobre Bucky Barnes',
-  description:
-    'Teorias, análises de filmes, guias de leitura, fanfics e os melhores produtos do Soldado Invernal / Capitão América em um só lugar.',
+  title: site.title,
+  tagline: site.tagline,
+  description: site.description,
   author: 'Sua Amiga',
 };
 
-// Links sociais — troque pelas URLs reais.
+// Links sociais — editáveis no painel (src/data/site.json).
 export const SOCIAL = {
-  twitter: 'https://x.com/seu_usuario',
-  tiktok: 'https://tiktok.com/@seu_usuario',
+  twitter: site.twitter,
+  tiktok: site.tiktok,
 };
 
 // E-mail de contato exibido no rodapé (deixe vazio '' para esconder).
-export const CONTACT_EMAIL = 'contato@seu-dominio.com';
+export const CONTACT_EMAIL = site.contactEmail;
 
 // Comentários do blog (Giscus). Preencha repoId e categoryId seguindo o README.
 // Enquanto estiverem como 'COLE_...', a seção de comentários fica oculta.

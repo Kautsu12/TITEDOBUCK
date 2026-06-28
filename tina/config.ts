@@ -25,6 +25,22 @@ export default defineConfig({
   schema: {
     collections: [
       {
+        name: 'config',
+        label: '⚙️ Configurações do site',
+        path: 'src/data',
+        format: 'json',
+        match: { include: 'site' },
+        ui: { allowedActions: { create: false, delete: false } },
+        fields: [
+          { type: 'string', name: 'title', label: 'Nome do site' },
+          { type: 'string', name: 'tagline', label: 'Frase principal (aparece grande na home)' },
+          { type: 'string', name: 'description', label: 'Descrição (SEO e subtítulo)', ui: { component: 'textarea' } },
+          { type: 'string', name: 'tiktok', label: 'Link do TikTok' },
+          { type: 'string', name: 'twitter', label: 'Link do X (Twitter)' },
+          { type: 'string', name: 'contactEmail', label: 'E-mail de contato' },
+        ],
+      },
+      {
         name: 'blog',
         label: 'Blog e Histórias',
         path: 'src/content/blog',

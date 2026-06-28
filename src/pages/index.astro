@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
+import BlogCard from '../components/BlogCard.astro';
 import { SITE, SOCIAL, AFFILIATE_DISCLOSURE } from '../config';
 
 // Último post do blog (ignora rascunhos, ordena por data desc).
@@ -9,6 +10,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 const latest = posts[0];
+const recentes = posts.slice(1, 4);
 
 // Produtos em destaque para a vitrine (até 3).
 const produtos = (await getCollection('produtos'))
@@ -82,6 +84,28 @@ const latestDate = latest?.data.pubDate.toLocaleDateString('pt-BR', {
           <span class="mt-5 text-sm font-semibold text-star">Ler artigo completo →</span>
         </div>
       </a>
+    </section>
+  )}
+
+  <!-- ===== NOVIDADES (mais recentes) ===== -->
+  {recentes.length > 0 && (
+    <section class="mx-auto max-w-6xl px-4 pb-4">
+      <div class="mb-8 flex items-end justify-between">
+        <h2 class="font-display text-2xl font-bold uppercase tracking-wide text-white">Novidades</h2>
+        <a href="/blog" class="text-sm text-steel transition hover:text-white">Ver tudo →</a>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {recentes.map((post) => (
+          <BlogCard
+            title={post.data.title}
+            description={post.data.description}
+            href={`/blog/${post.slug}`}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            cover={post.data.cover}
+          />
+        ))}
+      </div>
     </section>
   )}
 

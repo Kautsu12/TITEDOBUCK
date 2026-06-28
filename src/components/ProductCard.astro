@@ -43,13 +43,19 @@ const typeLabels: Record<string, string> = {
 <article
   class="group flex flex-col overflow-hidden rounded-xl border border-winter-600/60 bg-winter-800 transition hover:-translate-y-1 hover:border-star/70 hover:shadow-xl hover:shadow-black/40"
 >
-  <div class="relative aspect-square overflow-hidden bg-winter-700">
-    <img
-      src={image}
-      alt={title}
-      loading="lazy"
-      class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-    />
+  <div class="relative aspect-square overflow-hidden bg-gradient-to-br from-winter-700 to-winter-900">
+    {image ? (
+      <img
+        src={image}
+        alt={title}
+        loading="lazy"
+        class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      />
+    ) : (
+      <div class="flex h-full w-full items-center justify-center">
+        <span class="font-display text-7xl text-star/25 transition group-hover:text-star/40">★</span>
+      </div>
+    )}
     <span class="absolute left-3 top-3 rounded-full bg-winter-900/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent backdrop-blur">
       {typeLabels[type]}
     </span>
